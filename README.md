@@ -4,10 +4,10 @@
 **HealthVision**
 
 ## Group Members  
-- Juan Sebastain Pereira Lopez 
-- Iqra 
-- Integrant 3  
-- Integrant 4  
+• Juan Sebastain Pereira Lopez
+• iqra javed
+• Kaviyarasan Arul Jothi
+• Basit Ul Rehman
 
 ---
 
