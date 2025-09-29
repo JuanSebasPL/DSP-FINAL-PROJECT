@@ -5,7 +5,7 @@
 
 ## Group Members  
 • Juan Sebastain Pereira Lopez
-• iqra javedd
+• iqra javed
 • Kaviyarasan Arul Jothi
 • Basit Ul Rehman
 
