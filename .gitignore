@@ -1,0 +1,29 @@
+
+# Ignore all Airflow logs
+logs/
+logs/*
+
+# Ignore compiled Python cache files
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Ignore macOS system files
+*.DS_Store
+
+# Ignore environment and local config files
+.env
+.venv/
+*.env
+
+# Ignore IDE and editor settings
+.idea/
+.vscode/
+
+# Ignore Airflow local settings and SQLite db (if created locally)
+airflow.db
+airflow-webserver.pid
+
+# Ignore local data files (prevent large CSVs, model outputs, etc.)
+data/
