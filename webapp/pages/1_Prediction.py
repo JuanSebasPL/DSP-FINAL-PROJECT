@@ -5,13 +5,13 @@ import time
 import pandas as pd
 import streamlit as st
 
-# import our fake client (we run the app via app.py, so this path works)
-from api_client.fake import FakeAPIClient
+from api_client import get_client
 
 # --- SETTINGS (beginner-friendly) ---
 REQUIRED_COLUMNS = ["feature1", "feature2"]  # keep it simple for now
 
-client = FakeAPIClient()
+client = get_client()
+
 
 st.title("🔮 Prediction")
 st.caption("Make single or batch (CSV) predictions — using a Fake API for now.")

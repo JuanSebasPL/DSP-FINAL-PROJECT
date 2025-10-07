@@ -1,0 +1,26 @@
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.env
+
+# ---- Virtual environments ----
+.venv/
+venv/
+
+# ---- OS / Editor files ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---- Streamlit ----
+.streamlit/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- Logs ----
+*.log
