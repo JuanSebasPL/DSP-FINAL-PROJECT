@@ -1,15 +1,28 @@
-# Airflow generated files
+
+# Ignore all Airflow logs
 logs/
-airflow.cfg
-airflow.db
+logs/*
 
-# Python cache
-__pycache__/
-*.pyc
+# Ignore compiled Python cache files
+**/__pycache__/
+**/*.pyc
 
-# Environment and secrets
+# Ignore macOS system files
+*.DS_Store
+
+# Ignore environment files
 .env
-*.env
 
-# System files
-.DS_Store
+# Ignore IDE and editor settings
+.idea/
+.vscode/*
+
+# To keep project-level useful vscode files
+!.vscode/settings.json
+
+# Ignore Airflow local settings
+airflow.db
+airflow-webserver.pid
+
+# Ignore local data files
+data/

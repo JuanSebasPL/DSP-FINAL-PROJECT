@@ -19,7 +19,7 @@ DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 NEW_DIR = os.path.join(DATA_DIR, "new")
 SUCCESS_DIR = os.path.join(DATA_DIR, "success")
 SUCCESS_PROCESSED_DIR = os.path.join(DATA_DIR, "success_processed")
-PREDICT_ENDPOINT = "http://localhost:8000/predict"
+PREDICT_ENDPOINT = "http://api:8000/predict"
 
 #Read all the files in sucess folder and send the information to the API
 def process_success_files():
@@ -40,7 +40,10 @@ def process_success_files():
             payload = df.to_dict(orient="records")
             response = requests.post(PREDICT_ENDPOINT, json={"data": payload})
             response.raise_for_status()
+            result = response.json()
+            
             print(f"✅ Successfully sent {filename} to {PREDICT_ENDPOINT}")
+            print(f"🔍 API Response: {result}")
 
             dest = os.path.join(SUCCESS_PROCESSED_DIR, filename)
             shutil.move(filepath, dest)
