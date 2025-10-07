@@ -1,15 +1,50 @@
+# ==========================
+# Airflow and Project Files
+# ==========================
+
 # Airflow generated files
 logs/
+logs/*
 airflow.cfg
 airflow.db
+airflow-webserver.pid
 
-# Python cache
+# ==========================
+# Python Cache
+# ==========================
 __pycache__/
+**/__pycache__/
 *.pyc
+**/*.pyc
+**/*.pyo
+**/*.pyd
 
-# Environment and secrets
+# ==========================
+# Environment and Secrets
+# ==========================
 .env
 *.env
+.venv/
 
-# System files
+# ==========================
+# IDE and Editor Settings
+# ==========================
+.idea/
+.vscode/
+
+# ==========================
+# System Files
+# ==========================
 .DS_Store
+*.DS_Store
+
+# ==========================
+# Local Data Files
+# ==========================
+data/
+raw_data/
+
+# ==========================
+# Others
+# ==========================
+*.log
