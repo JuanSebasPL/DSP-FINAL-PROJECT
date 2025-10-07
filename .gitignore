@@ -1,14 +1,22 @@
 # ---- Python ----
 __pycache__/
+**/__pycache__/
 *.pyc
+**/*.pyc
 *.pyo
+**/*.pyo
 *.pyd
+**/*.pyd
 *.egg-info/
-.env
+*.log
 
 # ---- Virtual environments ----
 .venv/
 venv/
+
+# ---- Environment files ----
+.env
+*.env
 
 # ---- OS / Editor files ----
 .DS_Store
@@ -22,5 +30,11 @@ Thumbs.db
 # ---- Jupyter ----
 .ipynb_checkpoints/
 
-# ---- Logs ----
-*.log
+# ---- Airflow ----
+logs/
+logs/*
+airflow.db
+airflow-webserver.pid
+
+# ---- Data ----
+data/
