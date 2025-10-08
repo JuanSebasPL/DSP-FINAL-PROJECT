@@ -1,0 +1,18 @@
+
+CREATE TABLE IF NOT EXISTS diabetes_data (
+    id SERIAL PRIMARY KEY,
+    pregnancies INT,
+    glucose INT,
+    bloodpressure INT,
+    skinthickness INT,
+    insulin INT,
+    bmi NUMERIC(5,2),
+    diabetespedigreefunction NUMERIC(5,3),
+    age INT,
+    outcome INT
+);
+
+SELECT COUNT(*) FROM diabetes_data;
+
+
+

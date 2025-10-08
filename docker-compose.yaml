@@ -89,23 +89,39 @@ x-airflow-common:
 
 services:
   postgres:
-    image: postgres:16
+    image: postgres:15
+    container_name: airflow_postgres
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: airflow_db
     volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
       retries: 5
       start_period: 5s
-    restart: always
-    networks:
+      networks:
       - dsp_network
+pgadmin:
+  image: dpage/pgadmin4
+  container_name: pgadmin_container
+  ports:
+    - "5051:80"
+  environment:
+    PGADMIN_DEFAULT_EMAIL: admin@admin.com
+    PGADMIN_DEFAULT_PASSWORD: admin
 
-  redis:
+depends_on:
+      - postgres
+volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - postgres_data:
+      - pgadmin_data:
+restart: 
+      - unless-stopped
+redis:
     # Redis is limited to 7.2-bookworm due to licencing change
     # https://redis.io/blog/redis-adopts-dual-source-available-licensing/
     image: redis:7.2-bookworm
@@ -121,7 +137,7 @@ services:
     networks:
       - dsp_network
 
-  airflow-apiserver:
+airflow-apiserver:
     <<: *airflow-common
     command: api-server
     ports:
@@ -140,7 +156,7 @@ services:
     networks:
       - dsp_network
 
-  airflow-scheduler:
+airflow-scheduler:
     <<: *airflow-common
     command: scheduler
     healthcheck:
@@ -157,7 +173,7 @@ services:
     networks:
       - dsp_network
 
-  airflow-dag-processor:
+airflow-dag-processor:
     <<: *airflow-common
     command: dag-processor
     healthcheck:
@@ -174,7 +190,7 @@ services:
     networks:
       - dsp_network
 
-  airflow-worker:
+airflow-worker:
     <<: *airflow-common
     command: celery worker
     healthcheck:
@@ -201,7 +217,7 @@ services:
     networks:
       - dsp_network
 
-  airflow-triggerer:
+airflow-triggerer:
     <<: *airflow-common
     command: triggerer
     healthcheck:
@@ -218,7 +234,7 @@ services:
     networks:
       - dsp_network
 
-  airflow-init:
+airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
     # yamllint disable rule:line-length
@@ -312,7 +328,7 @@ services:
     networks:
       - dsp_network
 
-  airflow-cli:
+airflow-cli:
     <<: *airflow-common
     profiles:
       - debug
@@ -329,7 +345,7 @@ services:
     networks:
       - dsp_network
 
-  api:
+api:
     build:
       context: ./api
     container_name: fastapi-service
@@ -342,7 +358,7 @@ services:
   # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
   # or by explicitly targeted on the command line e.g. docker-compose up flower.
   # See: https://docs.docker.com/compose/profiles/
-  flower:
+flower:
     <<: *airflow-common
     command: celery flower
     profiles:
@@ -363,9 +379,12 @@ services:
     networks:
       - dsp_network
 
-volumes:
-  postgres-db-volume:
+    volumes:
+      postgres-db-volume:
+      postgres-data:
 
 networks:
   dsp_network:
     driver: bridge
+
+
