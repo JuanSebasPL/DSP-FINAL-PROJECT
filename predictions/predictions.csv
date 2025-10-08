@@ -1,2 +1,0 @@
-timestamp,PatientID,predicted,probability,Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age
-2025-10-08T09:30:40.717249,P001,1,0.58,6.0,148.0,72.0,35.0,0.0,33.6,0.627,50.0
