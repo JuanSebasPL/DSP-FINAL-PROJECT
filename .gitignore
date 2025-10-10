@@ -12,6 +12,7 @@ logs/*
 
 # Ignore environment files
 .env
+.venv/
 
 # Ignore IDE and editor settings
 .idea/

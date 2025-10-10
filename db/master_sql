@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS diabetes_data (
     id SERIAL PRIMARY KEY,
     pregnancies INT,
@@ -14,5 +13,27 @@ CREATE TABLE IF NOT EXISTS diabetes_data (
 
 SELECT COUNT(*) FROM diabetes_data;
 
+-- NEW TABLE FOR PREDICTIONS (ADD THIS BELOW) 
 
+CREATE TABLE IF NOT EXISTS predictions (
+    id SERIAL PRIMARY KEY,
+    pregnancies INT,
+    glucose INT,
+    bloodpressure INT,
+    skinthickness INT,
+    insulin INT,
+    bmi NUMERIC(5,2),
+    diabetespedigreefunction NUMERIC(5,3),
+    age INT,
+    prediction INT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    source VARCHAR(50)
+);
+
+-- Make it fast to search
+CREATE INDEX IF NOT EXISTS idx_predictions_timestamp ON predictions(timestamp);
+CREATE INDEX IF NOT EXISTS idx_predictions_source ON predictions(source);
+
+
+SELECT COUNT(*) FROM predictions;
 
