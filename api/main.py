@@ -5,12 +5,72 @@ from schemas.predict_schema import InputData
 from services.model_service import load_model, make_prediction, train_and_save_model
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
-
+from sqlalchemy import create_engine, text
 app = FastAPI(
     title="DSP Project API",
     description="Endpoints for training and predicting diabetes outcomes",
     version="1.0.0",
 )
+
+DB_CONN_STRING  = "postgresql+psycopg2://admin:admin@localhost:5432/airflow_db"
+ 
+def _build_engine(url: str):
+    try:
+        return create_engine(
+            url,
+            future=True,
+            pool_pre_ping=True,          # dropping dead connections
+            pool_recycle=1800,           # avoiding stale TCP
+            connect_args={"connect_timeout": 3},
+        )
+    except Exception as e:
+        print(f"[DB WARN] engine init failed: {e}")
+        return None
+ 
+engine = _build_engine(DB_CONN_STRING)
+
+def save_predictions_to_db(items: list[dict]) -> bool:
+    
+    if engine is None:
+        print("[DB WARN] No database engine - skipping save")
+        return False
+    
+    try:
+        with engine.connect() as conn:
+            for item in items:
+                
+                sql = text("""
+                    INSERT INTO diabetes_data 
+                    (pregnancies, glucose, bloodpressure, skinthickness, 
+                     insulin, bmi, diabetespedigreefunction, age, 
+                     prediction, timestamp, source)
+                    VALUES 
+                    (:pregnancies, :glucose, :bloodpressure, :skinthickness,
+                     :insulin, :bmi, :diabetespedigreefunction, :age,
+                     :prediction, :timestamp, :source)
+                """)
+                
+                conn.execute(sql, {
+                    "pregnancies": item.get("Pregnancies"),
+                    "glucose": item.get("Glucose"),
+                    "bloodpressure": item.get("BloodPressure"),
+                    "skinthickness": item.get("SkinThickness"),
+                    "insulin": item.get("Insulin"),
+                    "bmi": item.get("BMI"),
+                    "diabetespedigreefunction": item.get("DiabetesPedigreeFunction"),
+                    "age": item.get("Age"),
+                    "prediction": item.get("prediction"),
+                    "timestamp": item.get("timestamp"),
+                    "source": item.get("source"),
+                })
+            
+            conn.commit()
+            print(f"[DB] Saved {len(items)} predictions to database")
+            return True
+            
+    except Exception as e:
+        print(f"[DB ERROR] Failed to save predictions: {e}")
+        return False
 
 @app.get("/", summary="Root endpoint", tags=["System"])
 def root() -> dict[str, str]:
@@ -24,6 +84,7 @@ def train_model() -> dict[str, Any]:
         return result
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
 
 
 @app.post("/predict", summary="Predict diabetes outcome", tags=["Prediction"])
@@ -79,20 +140,10 @@ def predict(input_data: InputData) -> dict[str, Any]:
                 "timestamp": now_iso,
                 "source": "webapp",
             })
-
+        # NEW: Save predictions to database
+        save_predictions_to_db(items)
+            
         # Return both (keeps backward compatibility with any client expecting only 'predictions')
         return {"predictions": preds, "items": items}
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-# api/main.py
-import psycopg2
-from psycopg2.extras import RealDictCursor
-
-# Database connection
-def get_db_connection():
-    return psycopg2.connect(
-        host="postgres",  # Docker service name
-        database="airflow_db",
-        user="admin",
-        password="admin"
-    )

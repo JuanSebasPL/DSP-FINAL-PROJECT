@@ -19,11 +19,11 @@ from api_client import DiabetesAPIClient
 # Page configuration
 st.set_page_config(
     page_title="Diabetes Prediction",
-    page_icon="🔮",
+    page_icon="",
     layout="wide"
 )
 
-st.title("🔮 Diabetes Prediction")
+st.title(" Diabetes Prediction")
 st.markdown("Enter patient data manually or upload a CSV file to get diabetes risk predictions.")
 
 # Initialize API client
@@ -35,11 +35,9 @@ def get_client():
 client = get_client()
 
 # Create tabs for single vs batch prediction
-tab1, tab2 = st.tabs(["📝 Single Prediction", "📁 Batch Prediction (CSV)"])
+tab1, tab2 = st.tabs([" Single Prediction", " Batch Prediction (CSV)"])
 
-# ============================================================================
-# TAB 1: SINGLE PREDICTION
-# ============================================================================
+#Single predction func
 with tab1:
     st.subheader("Enter Patient Information")
     st.markdown("Fill in all 8 health indicators to get a diabetes risk prediction.")
@@ -152,20 +150,19 @@ with tab1:
                         st.success(" **LOW RISK**: This patient shows low diabetes risk indicators.")
                     
                     # Display full results
-                    st.subheader("📊 Detailed Results")
+                    st.subheader(" Detailed Results")
                     st.dataframe(result_df, use_container_width=True)
                     
                     # Display timestamp
                     timestamp = result_df.iloc[0].get("timestamp", "N/A")
-                    st.info(f"🕐 Prediction made at: {timestamp}")
+                    st.info(f" Prediction made at: {timestamp}")
                     
                 except Exception as e:
                     st.error(f" Prediction failed: {str(e)}")
                     st.info(" Make sure the FastAPI service is running!")
 
-# ============================================================================
-# TAB 2: BATCH PREDICTION (CSV Upload)
-# ============================================================================
+
+# Batch predic function
 with tab2:
     st.subheader("Upload CSV File for Batch Predictions")
     st.markdown("""
@@ -195,7 +192,7 @@ with tab2:
     csv_string = csv_buffer.getvalue()
     
     st.download_button(
-        label="📥 Download Sample CSV",
+        label=" Download Sample CSV",
         data=csv_string,
         file_name="diabetes_prediction_template.csv",
         mime="text/csv"
@@ -215,10 +212,10 @@ with tab2:
             # Read CSV
             df = pd.read_csv(uploaded_file)
             
-            st.success(f"✅ File uploaded successfully! Found {len(df)} rows.")
+            st.success(f" File uploaded successfully! Found {len(df)} rows.")
             
             # Show preview
-            with st.expander("👀 Preview uploaded data"):
+            with st.expander(" Preview uploaded data"):
                 st.dataframe(df.head(10), use_container_width=True)
             
             # Validate required columns
@@ -233,12 +230,12 @@ with tab2:
             missing_columns = [col for col in required_columns if col not in df.columns]
             
             if missing_columns:
-                st.error(f"❌ Missing required columns: {', '.join(missing_columns)}")
+                st.error(f" Missing required columns: {', '.join(missing_columns)}")
                 st.info("Please make sure your CSV has all required columns.")
             else:
                 # Predict button
-                if st.button("🔮 Predict for All Patients", use_container_width=True):
-                    with st.spinner(f"🔄 Making predictions for {len(df)} patients..."):
+                if st.button(" Predict for All Patients", use_container_width=True):
+                    with st.spinner(f" Making predictions for {len(df)} patients..."):
                         try:
                             # Convert DataFrame to list of dictionaries
                             rows = df[required_columns].to_dict('records')
@@ -247,7 +244,7 @@ with tab2:
                             result_df = client.predict(rows)
                             
                             # Display results
-                            st.success(f"✅ Predictions complete for {len(result_df)} patients!")
+                            st.success(f" Predictions complete for {len(result_df)} patients!")
                             
                             # Summary statistics
                             col1, col2, col3 = st.columns(3)
@@ -262,31 +259,29 @@ with tab2:
                                 st.metric("Low Risk", low_risk)
                             
                             # Display results table
-                            st.subheader("📊 Prediction Results")
+                            st.subheader(" Prediction Results")
                             st.dataframe(result_df, use_container_width=True)
                             
                             # Download results
                             result_csv = result_df.to_csv(index=False)
                             st.download_button(
-                                label="📥 Download Results as CSV",
+                                label=" Download Results as CSV",
                                 data=result_csv,
                                 file_name=f"predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                                 mime="text/csv"
                             )
                             
                         except Exception as e:
-                            st.error(f"❌ Batch prediction failed: {str(e)}")
-                            st.info("💡 Make sure the FastAPI service is running!")
+                            st.error(f" Batch prediction failed: {str(e)}")
+                            st.info(" Make sure the FastAPI service is running!")
         
         except Exception as e:
-            st.error(f"❌ Error reading CSV file: {str(e)}")
+            st.error(f" Error reading CSV file: {str(e)}")
             st.info("Please make sure your file is a valid CSV format.")
 
-# ============================================================================
-# SIDEBAR INFO
-# ============================================================================
+#Side bar details
 with st.sidebar:
-    st.header("ℹ️ About")
+    st.header(" About")
     st.markdown("""
     This prediction system uses machine learning to assess diabetes risk based on:
     - Medical history
@@ -299,12 +294,12 @@ with st.sidebar:
     st.markdown("---")
     
     # API Status check (optional)
-    if st.button("🔍 Check API Status"):
+    if st.button(" Check API Status"):
         with st.spinner("Checking..."):
             try:
                 status = client.health_check()
-                st.success("✅ API is running!")
+                st.success(" API is running!")
                 st.json(status)
             except Exception as e:
-                st.error("❌ API is not responding")
+                st.error(" API is not responding")
                 st.error(str(e))
