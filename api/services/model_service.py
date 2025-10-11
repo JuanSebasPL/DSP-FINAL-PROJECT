@@ -1,12 +1,12 @@
 import os
-import pickle
 import pandas as pd
 from typing import Any
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+import joblib
 
-MODEL_PATH = "models/model.pkl"
+MODEL_PATH = "models/model.joblib"
 DATA_PATH = "models/diabetes.csv"
 
 
@@ -40,8 +40,7 @@ def train_and_save_model() -> dict[str, Any]:
     acc = accuracy_score(y_test, preds)
 
     os.makedirs("models", exist_ok=True)
-    with open(MODEL_PATH, "wb") as f:
-        pickle.dump(model, f)
+    joblib.dump(model, MODEL_PATH)
 
     print(f"Model trained and saved (Accuracy: {acc:.2f})")
     return {"message": "Model created successfully", "accuracy": round(acc, 2)}

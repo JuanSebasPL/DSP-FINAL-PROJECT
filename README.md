@@ -31,7 +31,6 @@ Predicts diabetes risk (0/1) from patient health indicators. Focus is on **produ
 
 > Assumes `docker-compose` is available and a Python venv at `.venv/`.
 
-### 1) Terminal 1 — Database (PostgreSQL)
 ```bash
 cd ~/projects/final_dsp_project/DSP-FINAL-PROJECT
 docker-compose up -d postgres pgadmin   # pgAdmin is optional
