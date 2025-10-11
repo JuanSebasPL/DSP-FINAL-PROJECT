@@ -1,11 +1,12 @@
 from typing import Any
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from datetime import datetime
 from schemas.predict_schema import InputData
 from services.model_service import load_model, make_prediction, train_and_save_model
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 from sqlalchemy import create_engine, text
+
 app = FastAPI(
     title="DSP Project API",
     description="Endpoints for training and predicting diabetes outcomes",
@@ -88,7 +89,7 @@ def train_model() -> dict[str, Any]:
 
 
 @app.post("/predict", summary="Predict diabetes outcome", tags=["Prediction"])
-def predict(input_data: InputData) -> dict[str, Any]:
+def predict(input_data: InputData,source: str = Query("webapp", description="Origin of the request, e.g. webapp or scheduled"),) -> dict[str, Any]:
     model: RandomForestClassifier | None = load_model()
 
     if model is None:
@@ -131,6 +132,7 @@ def predict(input_data: InputData) -> dict[str, Any]:
         preds = make_prediction(model, df)  # update make_prediction to accept df OR pass df.to_dict('records')
         preds = [int(p) for p in preds] #JSON-Serializable
          # NEW: build detailed rows for the UI (timestamp + source + features)
+        now_iso = datetime.utcnow().isoformat()
         items = []
         now_iso = datetime.utcnow().isoformat()
         for i, p in enumerate(preds):
@@ -138,12 +140,11 @@ def predict(input_data: InputData) -> dict[str, Any]:
                 **df.iloc[i].to_dict(),
                 "prediction": p,
                 "timestamp": now_iso,
-                "source": "webapp",
+                "source": source,
             })
-        # NEW: Save predictions to database
+        # Save predictions to database
         save_predictions_to_db(items)
             
-        # Return both (keeps backward compatibility with any client expecting only 'predictions')
         return {"predictions": preds, "items": items}
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

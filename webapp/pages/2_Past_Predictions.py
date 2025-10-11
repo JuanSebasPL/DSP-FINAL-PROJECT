@@ -9,8 +9,12 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 from sqlalchemy import text, create_engine
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
 
 # Database connection
+
 DB_CONN_STRING = "postgresql+psycopg2://admin:admin@localhost:5432/airflow_db"
 
 def _build_engine(url: str):
@@ -47,23 +51,18 @@ st.markdown("View and filter historical diabetes predictions from the database."
 # QUERY Database Function
 
 def fetch_predictions_from_db(start_date: str, end_date: str, source: str):
-    """
-    Fetch predictions directly from database.
-    
-    Args:
-        start_date: Start date (YYYY-MM-DD)
-        end_date: End date (YYYY-MM-DD)
-        source: Source filter ("all", "webapp", "scheduled")
-    
-    Returns:
-        DataFrame with predictions or empty DataFrame if error
-    """
-    if engine is None:
-        st.error(" Database connection not available!")
-        return pd.DataFrame()
-    
+    """Fetch predictions from database."""
     try:
-        # Build query with filters
+        # Connect
+        conn = psycopg2.connect(
+            host="localhost",
+            port=5432,
+            database="airflow_db",
+            user="admin",
+            password="admin"
+        )
+        
+        # Start building query
         query = """
             SELECT 
                 id,
@@ -82,30 +81,42 @@ def fetch_predictions_from_db(start_date: str, end_date: str, source: str):
             WHERE 1=1
         """
         
-        params = {}
+        # IMPORTANT: params must be a LIST, not dict!
+        params = []  # ← LIST!
         
+        # Add filters
         if start_date:
-            query += " AND timestamp >= :start_date"
-            params["start_date"] = start_date
+            query += " AND timestamp >= %s"
+            params.append(start_date)  # ← append to list
         
         if end_date:
-            query += " AND timestamp <= :end_date"
-            params["end_date"] = f"{end_date} 23:59:59"  # Include entire end date
+            query += " AND timestamp <= %s"
+            params.append(f"{end_date} 23:59:59")  # ← append to list
         
         if source and source.lower() != "all":
-            query += " AND source = :source"
-            params["source"] = source.lower()
+            query += " AND source = %s"
+            params.append(source.lower())  # ← append to list
         
         query += " ORDER BY timestamp DESC"
         
-        # Execute query and return as DataFrame
-        with engine.connect() as conn:
-            df = pd.read_sql(text(query), conn, params=params)
+        # Execute query
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(query, params)  # params is a list
+        rows = cursor.fetchall()
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(rows)
+        
+        # Cleanup
+        cursor.close()
+        conn.close()
         
         return df
         
     except Exception as e:
-        st.error(f" Database query failed: {str(e)}")
+        st.error(f" Error: {str(e)}")
+        import traceback
+        st.code(traceback.format_exc())
         return pd.DataFrame()
 
 # ============================================================================

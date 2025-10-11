@@ -5,6 +5,8 @@ import pandas as pd
 from datetime import datetime
 from typing import List, Dict, Any
 
+
+
 def to_snake_case_row(row: Dict[str, Any]) -> Dict[str, Any]:
     """Convert UI keys (TitleCase) to API keys (snake_case)."""
     mapping = {
@@ -35,7 +37,7 @@ class DiabetesAPIClient:
         payload = {"data": [to_snake_case_row(r) for r in rows]}
 
         # 2) call API
-        r = requests.post(f"{self.base_url}/predict", json=payload, timeout=self.timeout)
+        r = requests.post(f"{self.base_url}/predict?source=webapp", json=payload, timeout=self.timeout)
         r.raise_for_status()
         data = r.json()  # expects {"predictions": [0/1, ...]}
 
@@ -47,7 +49,7 @@ class DiabetesAPIClient:
         df = pd.DataFrame(rows).copy()
         df["prediction"] = preds
         df["timestamp"] = datetime.utcnow().isoformat()
-        df["source"] = "webapp"
+        #df["source"] = ""
         return df
 
     # optional stub to keep the Past Predictions page happy
