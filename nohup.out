@@ -1,0 +1,21 @@
+/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/.venv/lib/python3.12/site-packages/airflow/configuration.py:859 FutureWarning: section/key [core/sql_alchemy_conn] has been deprecated, you should use[database/sql_alchemy_conn] instead. Please update your `conf.get*` call to use the new name
+/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/.venv/lib/python3.12/site-packages/airflow/configuration.py:859 FutureWarning: section/key [core/sql_alchemy_conn] has been deprecated, you should use[database/sql_alchemy_conn] instead. Please update your `conf.get*` call to use the new name
+/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/.venv/lib/python3.12/site-packages/flask_limiter/extension.py:333 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/.venv/lib/python3.12/site-packages/airflow/providers/fab/auth_manager/fab_auth_manager.py:558 FutureWarning: section/key [webserver/update_fab_perms] has been deprecated, you should use[fab/update_fab_perms] instead. Please update your `conf.get*` call to use the new name
+[2025-10-11 15:37:20 +0200] [45831] [INFO] Starting gunicorn 23.0.0
+
+Error: Already running on PID 73196 (or pid file '/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/airflow/airflow-webserver.pid' is stale)
+
+  ____________       _____________
+ ____    |__( )_________  __/__  /________      __
+____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /
+___  ___ |  / _  /   _  __/ _  / / /_/ /_ |/ |/ /
+ _/_/  |_/_/  /_/    /_/    /_/  \____/____/|__/
+Running the Gunicorn Server with:
+Workers: 4 sync
+Host: 0.0.0.0:8080
+Timeout: 120
+Logfiles: - -
+Access Logformat: 
+=================================================================
+[2025-10-11T15:38:11.825+0200] {webserver_command.py:430} INFO - Received signal: 2. Closing gunicorn.
