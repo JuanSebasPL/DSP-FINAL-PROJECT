@@ -29,6 +29,87 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT filename,\r\n       ROUND((nb_valid_rows * 100.0 / nb_rows), 2) AS quality_percentage\r\nFROM file_statistics;\r\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Data Quality Score",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bf5f2t3lfsv7kf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "mode": "palette-classic"
           },
           "custom": {
@@ -72,10 +153,10 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
+        "x": 12,
         "y": 0
       },
-      "id": 4,
+      "id": 1,
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
@@ -102,10 +183,14 @@
       "targets": [
         {
           "dataset": "airflow_db",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "bf5f2t3lfsv7kf"
+          },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  source as \"Source\",\r\n  COUNT(*) as \"Total Predictions\"\r\nFROM diabetes_data\r\nWHERE timestamp > NOW() - INTERVAL '30 minutes'\r\nGROUP BY source;",
+          "rawSql": "SELECT filename, nb_valid_rows, nb_invalid_rows\r\nFROM file_statistics;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -126,7 +211,7 @@
           }
         }
       ],
-      "title": "Predictions by Source",
+      "title": "Valid vs Invalid Rows per File",
       "type": "barchart"
     },
     {
@@ -137,119 +222,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.3.0",
-      "targets": [
-        {
-          "dataset": "airflow_db",
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  timestamp AS time,\r\n  AVG(prediction) as \"Average Prediction\"\r\nFROM diabetes_data\r\nWHERE timestamp > NOW() - INTERVAL '30 minutes'\r\nGROUP BY timestamp\r\nORDER BY timestamp;",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Average Predictions - Last 30 Minutes",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "bf5f2t3lfsv7kf"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
+            "mode": "continuous-GrYlRd"
           },
           "mappings": [],
           "thresholds": {
@@ -274,23 +247,28 @@
         "x": 0,
         "y": 8
       },
-      "id": 3,
+      "id": 2,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
       "pluginVersion": "12.3.0",
       "targets": [
@@ -299,7 +277,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  AVG(glucose) as \"Avg Glucose\",\r\n  AVG(bloodpressure) as \"Avg Blood Pressure\",\r\n  AVG(bmi) as \"Avg BMI\"\r\nFROM diabetes_data\r\nWHERE timestamp > NOW() - INTERVAL '30 minutes';",
+          "rawSql": "SELECT filename, nb_rows\r\nFROM file_statistics;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -320,8 +298,8 @@
           }
         }
       ],
-      "title": "Average Feature Values ",
-      "type": "stat"
+      "title": "Total Rows per File ",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -331,16 +309,32 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
           },
-          "mappings": []
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -350,40 +344,19 @@
         "x": 12,
         "y": 8
       },
-      "id": 1,
+      "id": 3,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
+        "cellHeight": "sm",
+        "showHeader": true
       },
       "pluginVersion": "12.3.0",
       "targets": [
         {
           "dataset": "airflow_db",
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "bf5f2t3lfsv7kf"
-          },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  prediction::text as \"Prediction\",\r\n  COUNT(*) as \"Count\"\r\nFROM diabetes_data\r\nWHERE timestamp > NOW() - INTERVAL '30 minutes'\r\nGROUP BY prediction;",
+          "rawSql": "SELECT filename,\r\n       CASE WHEN errors IS NULL THEN 'No Errors' ELSE 'Has Errors' END AS error_status\r\nFROM file_statistics;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -404,8 +377,8 @@
           }
         }
       ],
-      "title": "Prediction Distribution - Last 30 Minutes",
-      "type": "piechart"
+      "title": "Files With Errors",
+      "type": "table"
     }
   ],
   "preload": false,
@@ -415,12 +388,12 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Data Drift and Prediction Issues",
-  "uid": "adrq25c",
-  "version": 8
+  "title": "file_statistics",
+  "uid": "adrm9gn",
+  "version": 12
 }

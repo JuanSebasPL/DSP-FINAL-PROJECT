@@ -25,34 +25,3 @@ CREATE TABLE file_statistics (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- --TABLE FOR DATA QUALITY ISSUES
--- CREATE TABLE data_quality_issues (
---     id SERIAL PRIMARY KEY,
---     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     filename VARCHAR(255),
---     error_type VARCHAR(100),
---     error_category VARCHAR(100),
---     column_name VARCHAR(100),
---     error_count INT,
---     criticality VARCHAR(20),
---     total_rows INT,
---     valid_rows INT,
---     invalid_rows INT
--- );
-
--- --TABLE FOR DATA INGESTION STATISTICS
--- CREATE TABLE ingestion_statistics (
---     id SERIAL PRIMARY KEY,
---     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     filename VARCHAR(255),
---     total_rows INT,
---     valid_rows INT,
---     invalid_rows INT,
---     error_count INT,
---     has_missing_columns BOOLEAN,
---     has_missing_values BOOLEAN,
---     has_invalid_values BOOLEAN,
---     criticality VARCHAR(20),
---     processing_status VARCHAR(50)
--- );
-

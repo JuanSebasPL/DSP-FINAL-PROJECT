@@ -71,45 +71,96 @@ def read_random_file(**context):
 def validate_data(**context):
     df = pd.read_json(context["ti"].xcom_pull(key="dataframe"))
 
-    errors = []
+    errors_detected = set()   # global list of error types
     good_rows = []
     bad_rows = []
 
-    # Check missing columns
-    missing_cols = [c for c in EXPECTED_COLUMNS if c not in df.columns]
-    if missing_cols:
-        errors.append(f"Missing columns: {missing_cols}")
+    # -------------------------------
+    # 1. Column-level validation
+    # -------------------------------
+    required_cols = EXPECTED_COLUMNS + ["Outcome"]
 
-    # Row-level validation
+    # Missing columns
+    missing_cols = [c for c in required_cols if c not in df.columns]
+    if missing_cols:
+        errors_detected.add("missing columns")
+
+    # Extra columns
+    extra_cols = [c for c in df.columns if c not in required_cols]
+    if extra_cols:
+        errors_detected.add("extra columns")
+
+    # Wrong number of columns per row
+    if len(df.columns) != len(required_cols):
+        errors_detected.add("incorrect number of columns")
+
+    # ---------------------------------------
+    # 2. Row-level validation
+    # ---------------------------------------
     for idx, row in df.iterrows():
-        row_errors = []
+        row_is_bad = False
 
         for col, dtype in EXPECTED_DTYPES.items():
+            value = row.get(col)
+
+            # Null or NaN
+            if pd.isna(value):
+                errors_detected.add("null or NaN value")
+                row_is_bad = True
+                continue
+
+            # Datatype check
             try:
                 if dtype == "int":
-                    int(row[col])
+                    casted = int(value)
                 elif dtype == "float":
-                    float(row[col])
+                    casted = float(value)
             except:
-                row_errors.append(f"{col} should be {dtype}")
+                errors_detected.add("invalid datatype")
+                row_is_bad = True
+                continue
 
-        if row_errors:
+            # Negative numeric values
+            if casted < 0:
+                errors_detected.add("negative numeric value")
+                row_is_bad = True
+
+            # Age out of realistic range
+            if col == "Age" and not (0 <= casted <= 130):
+                errors_detected.add("age out of range")
+                row_is_bad = True
+
+            # Insulin range check (example range: 0–900 µU/mL)
+            if col == "Insulin" and not (0 <= casted <= 900):
+                errors_detected.add("insulin out of range")
+                row_is_bad = True
+
+        # Outcome check
+        outcome = row.get("Outcome")
+        if pd.isna(outcome) or outcome not in [0, 1]:
+            errors_detected.add("invalid outcome value")
+            row_is_bad = True
+
+        # Add to lists
+        if row_is_bad:
             bad_rows.append(row)
         else:
             good_rows.append(row)
 
+    # ---------------------------------------
+    # Build final validation result
+    # ---------------------------------------
     validation_result = {
-        "errors": ";".join(errors) if errors else "",
+        "errors": ";".join(sorted(errors_detected)),
         "nb_rows": len(df),
         "nb_good": len(good_rows),
         "nb_bad": len(bad_rows),
-        "has_errors": len(errors) > 0 or len(bad_rows) > 0,
+        "has_errors": len(errors_detected) > 0,
         "good_df_json": pd.DataFrame(good_rows).to_json(),
         "bad_df_json": pd.DataFrame(bad_rows).to_json(),
     }
 
     context["ti"].xcom_push(key="validation", value=validation_result)
-
 
 # ---------------------------------------------------------------------
 # TASK 3 — SAVE STATISTICS
@@ -142,13 +193,14 @@ def save_statistics(**context):
 # ---------------------------------------------------------------------
 # TASK 4 — SEND ALERTS + HTML REPORT
 # ---------------------------------------------------------------------
+
 def send_alerts(**context):
     validation = context["ti"].xcom_pull(key="validation")
     filename = context["ti"].xcom_pull(key="filename")
 
     report_path = os.path.join(REPORTS_DIR, f"{filename}_report.html")
 
-    # Minimal HTML report (replace with Great Expectations later)
+    # Generate HTML report
     with open(report_path, "w") as f:
         f.write("<h1>Data Quality Report</h1>")
         f.write(f"<p>File: {filename}</p>")
@@ -159,12 +211,35 @@ def send_alerts(**context):
 
     print(f"Generated report: {report_path}")
 
-    # Placeholder: Teams webhook
+    # Your Power Automate webhook URL
+    POWER_AUTOMATE_URL = (
+        "https://default3534b3d7316c4bc99ede605c860f49."
+        "d2.environment.api.powerplatform.com:443/powerautomate/automations/direct/"
+        "workflows/86b84d99340e439a8ec7eda4788a9ecd/triggers/manual/"
+        "paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig="
+        "zY7ket8QdnSBVLSrRVMnBG8bcgEixVMrGKEBzW7UZLc"
+    )
+
+    # If validation has errors, send alert to Teams via Power Automate
     if validation["has_errors"]:
-        print("ALERT: Data quality issues detected")
+        payload = {
+            "filename": filename,
+            "nb_rows": validation["nb_rows"],
+            "nb_good": validation["nb_good"],
+            "nb_bad": validation["nb_bad"],
+            "errors": validation["errors"],
+            "report_path": report_path,
+            "alert": f"Data quality issues detected in {filename}"
+        }
+
+        try:
+            response = requests.post(POWER_AUTOMATE_URL, json=payload)
+            response.raise_for_status()
+            print("Teams alert sent successfully through Power Automate workflow")
+        except Exception as e:
+            print(f"Failed to send alert to Teams workflow: {e}")
 
     context["ti"].xcom_push(key="report_path", value=report_path)
-
 
 # ---------------------------------------------------------------------
 # TASK 5 — SAVE FILE (good_data / bad_data / split)
