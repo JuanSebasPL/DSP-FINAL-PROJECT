@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 0,
   "links": [],
   "panels": [
     {
@@ -32,53 +32,13 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
             }
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "mappings": []
         },
         "overrides": []
       },
@@ -88,14 +48,22 @@
         "x": 0,
         "y": 0
       },
-      "id": 4,
+      "id": 5,
       "options": {
         "legend": {
-          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
         "tooltip": {
           "hideZeros": false,
           "mode": "single",
@@ -109,7 +77,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  timestamp AS time,\r\n  (valid_rows::float / NULLIF(total_rows, 0) * 100) as \"Valid Data %\",\r\n  (invalid_rows::float / NULLIF(total_rows, 0) * 100) as \"Invalid Data %\"\r\nFROM ingestion_statistics\r\nWHERE timestamp > NOW() - INTERVAL '10 minutes'\r\nORDER BY timestamp;",
+          "rawSql": "SELECT prediction AS label, COUNT(*) AS value\r\nFROM diabetes_data\r\nGROUP BY prediction\r\nORDER BY prediction;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -130,8 +98,8 @@
           }
         }
       ],
-      "title": "Valid vs Invalid Data % - Last 10 Minutes",
-      "type": "timeseries"
+      "title": "Predictions by Source",
+      "type": "piechart"
     },
     {
       "datasource": {
@@ -141,7 +109,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "custom": {
             "axisBorderShow": false,
@@ -221,7 +189,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  error_category as \"Error Category\",\r\n  SUM(error_count) as \"Total Errors\"\r\nFROM data_quality_issues\r\nWHERE timestamp > NOW() - INTERVAL '10 minutes'\r\nGROUP BY error_category\r\nORDER BY \"Total Errors\" DESC;",
+          "rawSql": "SELECT \r\n    CASE \r\n        WHEN prediction = 1 THEN 'Positive'\r\n        WHEN prediction = 0 THEN 'Negative'\r\n        ELSE 'Unknown'\r\n    END AS prediction_label,\r\n    COUNT(*) AS total\r\nFROM diabetes_data\r\nGROUP BY prediction_label\r\nORDER BY prediction_label;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -242,7 +210,7 @@
           }
         }
       ],
-      "title": "Data Quality Errors by Category - Last 10 Minutes",
+      "title": "Prediction Distribution",
       "type": "barchart"
     },
     {
@@ -253,7 +221,21 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -268,8 +250,7 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "percent"
+          }
         },
         "overrides": []
       },
@@ -281,96 +262,12 @@
       },
       "id": 3,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.0",
-      "targets": [
-        {
-          "dataset": "airflow_db",
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  ROUND(COUNT(CASE WHEN processing_status = 'success' THEN 1 END)::numeric / COUNT(*) * 100, 2) as \"Success Rate\"\r\nFROM ingestion_statistics\r\nWHERE timestamp > NOW() - INTERVAL '10 minutes';",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Data Ingestion Success Rate - Last 10 Minutes",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "bf5f2t3lfsv7kf"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
-      },
-      "id": 2,
-      "options": {
         "legend": {
+          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "sort": "desc",
         "tooltip": {
           "hideZeros": false,
           "mode": "single",
@@ -384,7 +281,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  criticality as \"Criticality\",\r\n  COUNT(*) as \"Count\"\r\nFROM ingestion_statistics\r\nWHERE timestamp > NOW() - INTERVAL '10 minutes'\r\nGROUP BY criticality;",
+          "rawSql": "SELECT bmi\r\nFROM diabetes_data;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -405,8 +302,120 @@
           }
         }
       ],
-      "title": "Data Issues by Criticality Level - Last 10 Minutes",
-      "type": "piechart"
+      "title": "BMI Distribution",
+      "type": "histogram"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bf5f2t3lfsv7kf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    timestamp AS time,\r\n    glucose\r\nFROM diabetes_data\r\nORDER BY timestamp;\r\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Glucose Levels Over Time",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -416,12 +425,12 @@
     "list": []
   },
   "time": {
-    "from": "now-10m",
+    "from": "now-5y",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Data Quality Monitoring Dashboard",
-  "uid": "adfg8xk",
-  "version": 9
+  "title": "diabetes_data",
+  "uid": "adbrxln",
+  "version": 16
 }
