@@ -14,6 +14,17 @@ CREATE TABLE diabetes_data (
     prediction INT
 );
 
+
+CREATE TABLE file_statistics (
+    id SERIAL PRIMARY KEY,
+    filename TEXT NOT NULL,
+    nb_rows INTEGER NOT NULL,
+    nb_valid_rows INTEGER NOT NULL,
+    nb_invalid_rows INTEGER NOT NULL,
+    errors TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 --TABLE FOR DATA QUALITY ISSUES
 CREATE TABLE data_quality_issues (
     id SERIAL PRIMARY KEY,
