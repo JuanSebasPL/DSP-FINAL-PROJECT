@@ -14,8 +14,9 @@ app = FastAPI(
     version="1.0.0",
 )
 
-DB_CONN_STRING  = "postgresql+psycopg2://admin:admin@localhost:5432/airflow_db"
- 
+DB_CONN_STRING = "postgresql+psycopg2://admin:admin@localhost:5432/airflow_db"
+
+
 def _build_engine(url: str):
     try:
         return create_engine(
@@ -28,7 +29,8 @@ def _build_engine(url: str):
     except Exception as e:
         print(f"[DB WARN] engine init failed: {e}")
         return None
- 
+
+
 engine = _build_engine(DB_CONN_STRING)
 
 
@@ -44,13 +46,13 @@ def save_predictions_to_db(items: list[dict]) -> bool:
         with engine.connect() as conn:
             for item in items:
                 sql = text("""
-                    INSERT INTO diabetes_data 
+                    INSERT INTO diabetes_data
                     (
                         pregnancies, glucose, bloodpressure, skinthickness,
                         insulin, bmi, diabetespedigreefunction, age,
                         prediction, actual_outcome, timestamp, source
                     )
-                    VALUES 
+                    VALUES
                     (
                         :pregnancies, :glucose, :bloodpressure, :skinthickness,
                         :insulin, :bmi, :diabetespedigreefunction, :age,
@@ -82,7 +84,6 @@ def save_predictions_to_db(items: list[dict]) -> bool:
         return False
 
 
-
 # -------------------------------------------------------------------
 # ROUTES
 # -------------------------------------------------------------------
@@ -109,7 +110,7 @@ def predict(
     model = load_model()
 
     if model is None:
-        return {"predictions": [], "message": "Model nott found. Please train first."}
+        return {"predictions": [], "message": "Model not found. Please train first."}
 
     try:
         df = pd.DataFrame(input_data.data)
@@ -142,7 +143,6 @@ def predict(
         if "actual_outcome" in df.columns:
             labels = df["actual_outcome"].copy()
 
-
         expected = [
             "Pregnancies", "Glucose", "BloodPressure", "SkinThickness",
             "Insulin", "BMI", "DiabetesPedigreeFunction", "Age"
@@ -152,7 +152,7 @@ def predict(
             raise HTTPException(status_code=400, detail=f"Missing columns: {missing}")
 
         df_features = df[expected]
-        
+
         preds = make_prediction(model, df_features)
 
         preds = [int(p) for p in preds]
@@ -181,7 +181,6 @@ def predict(
 
         return {"predictions": preds, "items": items}
 
-
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -203,11 +202,11 @@ def save_statistics_api(
     try:
         with engine.connect() as conn:
             sql = text("""
-                INSERT INTO file_statistics 
+                INSERT INTO file_statistics
                 (filename, nb_rows, nb_valid_rows, nb_invalid_rows, errors, timestamp)
                 VALUES (:filename, :nb_rows, :nb_valid_rows, :nb_invalid_rows, :errors, :timestamp)
             """)
-            
+
             conn.execute(sql, {
                 "filename": payload["filename"],
                 "nb_rows": payload["nb_rows"],
@@ -216,7 +215,6 @@ def save_statistics_api(
                 "errors": json.dumps(payload.get("errors", [])),
                 "timestamp": payload["timestamp"],
             })
-
 
             conn.commit()
 

@@ -14,6 +14,7 @@ NUM_FILES = 50
 ROWS_PER_FILE = 10
 FILE_PREFIX = "diabetes_batch"
 
+
 def generate_csv_files():
     print("=" * 60)
     print("CSV FILE GENERATOR")
@@ -40,6 +41,7 @@ def generate_csv_files():
             print(f"  Created {i + 1}/{NUM_FILES} files...")
 
     print(f"\nSUCCESS! Created {NUM_FILES} files in {OUTPUT_DIR}/")
+
 
 if __name__ == "__main__":
     generate_csv_files()

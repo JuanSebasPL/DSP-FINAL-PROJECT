@@ -27,3 +27,4 @@ airflow-webserver.pid
 
 # Ignore local data files
 data/
+airflow_data_example/*

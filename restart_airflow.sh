@@ -4,7 +4,7 @@ echo "============================"
 echo " SAFE AIRFLOW RESTART SCRIPT"
 echo "============================"
 
-AIRFLOW_HOME="/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/airflow"
+AIRFLOW_HOME="/Users/juan/Epita/S2/DSA_Production/DSP-FINAL-PROJECT/airflow"
 
 echo "[1] Stopping existing Airflow processes..."
 pkill -f "airflow scheduler"

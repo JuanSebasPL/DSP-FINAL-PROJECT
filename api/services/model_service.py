@@ -1,5 +1,4 @@
 import os
-import pickle
 import pandas as pd
 from typing import Any
 from sklearn.ensemble import RandomForestClassifier
@@ -7,8 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import joblib
 
-MODEL_PATH = "../models/model.joblib"
-DATA_PATH = "/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/api/models/diabetes.csv"
+MODEL_PATH = "/Users/juan/Epita/S2/DSA_Production/DSP-FINAL-PROJECT/models/model.joblib"
+DATA_PATH = "/Users/juan/Epita/S2/DSA_Production/DSP-FINAL-PROJECT/api/models/diabetes.csv"
 
 
 def load_model() -> RandomForestClassifier | None:

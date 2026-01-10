@@ -1,19 +1,19 @@
-# webapp/pages/1_Prediction.py
-"""
-Diabetes Prediction Page
-========================
-Allows users to make diabetes predictions in two ways:
-1. Single prediction - Manual form entry
-2. Batch prediction - CSV file upload
-"""
+
+import sys
+sys.path.append("..")
 
 import streamlit as st
 import pandas as pd
 import io
 from datetime import datetime
-import sys
-sys.path.append('..')
+
 from api_client import DiabetesAPIClient
+
+# Diabetes Prediction Page
+# ========================
+# Allows users to make diabetes predictions in two ways:
+# 1. Single prediction - Manual form entry
+# 2. Batch prediction - CSV file upload
 
 
 # Page configuration
@@ -26,27 +26,29 @@ st.set_page_config(
 st.title(" Diabetes Prediction")
 st.markdown("Enter patient data manually or upload a CSV file to get diabetes risk predictions.")
 
+
 # Initialize API client
 @st.cache_resource
 def get_client():
     """Initialize and cache the API client."""
     return DiabetesAPIClient()
 
+
 client = get_client()
 
 # Create tabs for single vs batch prediction
 tab1, tab2 = st.tabs([" Single Prediction", " Batch Prediction (CSV)"])
 
-#Single predction func
+# Single predction func
 with tab1:
     st.subheader("Enter Patient Information")
     st.markdown("Fill in all 8 health indicators to get a diabetes risk prediction.")
-    
+
     # Create a form for single prediction
     with st.form("single_prediction_form"):
         # Use columns for better layout
         col1, col2 = st.columns(2)
-        
+
         with col1:
             pregnancies = st.number_input(
                 "Pregnancies",
@@ -55,7 +57,7 @@ with tab1:
                 value=1,
                 help="Number of times pregnant (0-17 typical range)"
             )
-            
+
             glucose = st.number_input(
                 "Glucose (mg/dL)",
                 min_value=0,
@@ -63,7 +65,7 @@ with tab1:
                 value=120,
                 help="Plasma glucose concentration (70-200 typical range)"
             )
-            
+
             blood_pressure = st.number_input(
                 "Blood Pressure (mm Hg)",
                 min_value=0,

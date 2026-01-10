@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.providers.standard.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator
 from airflow.exceptions import AirflowSkipException
 
 from datetime import datetime, timedelta
@@ -16,13 +16,18 @@ default_args = {
 # -------------------------------------------------------------------
 # FIXED ABSOLUTE PATHS (FINAL — DO NOT CHANGE)
 # -------------------------------------------------------------------
+# BASE_PATH = "/opt/airflow/DSP-FINAL-PROJECT/data"
+# GOOD_DATA_DIR = os.path.join(BASE_PATH, "good_data")
+# PROCESSED_LIST = os.path.join(BASE_PATH, "processed_files.txt")
+# PREDICT_ENDPOINT = "http://127.0.0.1:8000/predict?source=scheduled"
+BASE_DIR = os.path.dirname(__file__)
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+GOOD_DATA_DIR = os.path.join(DATA_DIR, "good_data")  # folder with ingested files
+PROCESSED_LIST = os.path.join(DATA_DIR, "processed_files.txt")
+# PREDICT_ENDPOINT = "http://127.0.0.1:8000/predict?source=scheduled"
+PREDICT_ENDPOINT = "http://host.docker.internal:8000/predict?source=scheduled"
 
-BASE_PATH = "/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/data"
-
-GOOD_DATA_DIR = os.path.join(BASE_PATH, "good_data")
-PROCESSED_LIST = os.path.join(BASE_PATH, "processed_files.txt")
-
-PREDICT_ENDPOINT = "http://127.0.0.1:8000/predict?source=scheduled"
 
 # -------------------------------------------------------------------
 # Utility: load list of already processed files
@@ -33,6 +38,7 @@ def load_processed_files():
     with open(PROCESSED_LIST, "r") as f:
         return set(line.strip() for line in f.readlines())
 
+
 # -------------------------------------------------------------------
 # Utility: save processed files
 # -------------------------------------------------------------------
@@ -40,6 +46,7 @@ def save_processed_files(files):
     with open(PROCESSED_LIST, "a") as f:
         for file in files:
             f.write(file + "\n")
+
 
 # -------------------------------------------------------------------
 # Task 1 – Check for NEW DATA
@@ -62,6 +69,7 @@ def check_for_new_data(**context):
     print(f"New files detected: {new_files}")
 
     context["ti"].xcom_push(key="new_files", value=new_files)
+
 
 # -------------------------------------------------------------------
 # Task 2 – Read new files & make predictions
@@ -95,6 +103,7 @@ def make_predictions(**context):
 
     save_processed_files(new_files)
     print("Updated processed_files registry.")
+
 
 # -------------------------------------------------------------------
 # DAG DEFINITION

@@ -6,7 +6,6 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 
-
 def to_snake_case_row(row: Dict[str, Any]) -> Dict[str, Any]:
     """Convert UI keys (TitleCase) to API keys (snake_case)."""
     mapping = {
@@ -20,6 +19,7 @@ def to_snake_case_row(row: Dict[str, Any]) -> Dict[str, Any]:
         "Age": "age",
     }
     return {mapping.get(k, k): v for k, v in row.items()}
+
 
 class DiabetesAPIClient:
     def __init__(self, base_url: str = "http://127.0.0.1:8000"):
@@ -49,13 +49,12 @@ class DiabetesAPIClient:
         df = pd.DataFrame(rows).copy()
         df["prediction"] = preds
         df["timestamp"] = datetime.utcnow().isoformat()
-        #df["source"] = ""
         return df
 
     # optional stub to keep the Past Predictions page happy
     def get_past_predictions(self, *args, **kwargs) -> pd.DataFrame:
         cols = [
-            "timestamp","Pregnancies","Glucose","BloodPressure","SkinThickness",
-            "Insulin","BMI","DiabetesPedigreeFunction","Age","prediction","source"
+            "timestamp", "Pregnancies", "Glucose", "BloodPressure", "SkinThickness",
+            "Insulin", "BMI", "DiabetesPedigreeFunction", "Age", "prediction", "source"
         ]
         return pd.DataFrame(columns=cols)
