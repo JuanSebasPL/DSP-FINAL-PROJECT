@@ -1,5 +1,4 @@
 HealthVision – Diabetes Prediction System
-
 End-to-End Data Science in Production Project
 
 An end-to-end machine learning system for diabetes risk prediction, focusing on production engineering, including APIs, databases, orchestration, automation, and reproducibility.
@@ -24,6 +23,8 @@ Docker Compose for infrastructure services
 
 Production-grade startup script (manage.sh) to run everything cleanly
 
+Grafana dashboards for monitoring, data quality, and model performance
+
 Tech Stack
 Component	Technology
 UI	Streamlit
@@ -31,24 +32,27 @@ API	FastAPI + Uvicorn
 ML	scikit-learn
 Database	PostgreSQL
 Orchestration	Apache Airflow
+Monitoring	Grafana
 Infrastructure	Docker + Docker Compose
 Language	Python 3.12
 Project Structure
 DSP-FINAL-PROJECT/
-├── api/                    # FastAPI backend
-├── webapp/                 # Streamlit UI
-├── airflow/                # Airflow home (DAGs, logs, config)
+├── api/                  # FastAPI backend
+├── webapp/               # Streamlit UI
+├── airflow/              # Airflow home (DAGs, logs, config)
 │   └── dags/
 ├── data/
-│   ├── raw_data/           # Incoming CSVs
-│   ├── good_data/          # Validated data
-│   └── bad_data/           # Invalid data
+│   ├── raw_data/         # Incoming CSVs
+│   ├── good_data/        # Validated data
+│   └── bad_data/         # Invalid data
 ├── db/
-│   └── master_sql          # Database schema
-├── docker-compose.yaml     # Postgres + pgAdmin
-├── .venv/                  # Python virtual environment
-├── manage.sh               # Professional service manager
-├── env.sh                  # Shared environment variables
+│   └── master_sql        # Database schema
+├── grafana/              # Grafana dashboards & provisioning
+│   └── dashboards/
+├── docker-compose.yaml   # Postgres, pgAdmin, Grafana
+├── .venv/                # Python virtual environment
+├── manage.sh             # Professional service manager
+├── env.sh                # Shared environment variables
 └── README.md
 
 Dataset
@@ -78,7 +82,7 @@ Target: Outcome (0 = No Diabetes, 1 = Diabetes)
 
 How to Run Everything (Recommended Way)
 
-⚠️ This project should always be started using manage.sh
+⚠️ This project should always be started using manage.sh.
 It automatically stops conflicting services and avoids port issues.
 
 1️⃣ Prerequisites
@@ -98,7 +102,7 @@ From the project root:
 
 This will automatically:
 
-Start Docker services (Postgres + pgAdmin)
+Start Docker services (Postgres + pgAdmin + Grafana)
 
 Start FastAPI (port 8000)
 
@@ -128,6 +132,8 @@ FastAPI	http://localhost:8000
 Streamlit UI	http://localhost:8501
 
 Airflow UI	http://localhost:8080
+
+Grafana	http://localhost:3000
 
 pgAdmin	http://localhost:5051
 
@@ -174,6 +180,8 @@ Input features
 
 Prediction result
 
+Actual outcome (ground truth when available)
+
 Source (webapp or scheduled)
 
 Timestamp
@@ -191,6 +199,53 @@ Valid / invalid rows
 Validation errors
 
 Timestamp
+
+Grafana Monitoring & Dashboards
+
+Grafana is used for production monitoring and analytics.
+
+Available Dashboards
+
+Model Performance Monitoring
+
+Error distribution (TP / FP / FN / TN)
+
+Accuracy over time (labeled data only)
+
+False Negative / False Positive tracking
+
+Prediction Monitoring
+
+Prediction distribution (0 vs 1)
+
+Predicted diabetes rate (%)
+
+Prediction volume over time
+
+Data Quality Monitoring
+
+Validation error rate over time
+
+Data quality trends from ingestion pipelines
+
+⚠️ Some metrics intentionally require labeled data (actual_outcome).
+No fake confidence or probability metrics are used.
+
+Running Grafana Manually (if needed)
+
+Check available services:
+
+docker compose config --services
+
+
+Start Grafana:
+
+docker compose up -d grafana
+
+
+Access Grafana:
+
+http://localhost:3000
 
 Logs & Debugging
 
@@ -245,23 +300,6 @@ Robust error handling
 
 Reproducible infrastructure
 
+Ethical monitoring (no fake metrics)
+
 Clean operational workflows
-
-
-
-To run Grafana:
-
-
-- First, see what the service is called in compose:
-
-docker compose config --services
-
-
-- If grafana appears in the list, start it:
-
-docker compose up -d grafana
-
-
-- If the service name is different (like grafana-service), run:
-
-docker compose up -d <service_name>
