@@ -1,0 +1,34 @@
+[2025-11-29T10:24:01.620+0100] {executor_loader.py:254} INFO - Loaded executor: LocalExecutor
+[2025-11-29T10:27:49.777+0100] {serve_logs.py:85} WARNING - The Authorization header is missing: Host: localhost:8793
+Connection: keep-alive
+Sec-Ch-Ua: "Not(A:Brand";v="99", "Google Chrome";v="133", "Chromium";v="133"
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Platform: "Windows"
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: none
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-GB,en-US;q=0.9,en;q=0.8,fr;q=0.7
+Cookie: rl_page_init_referrer=RudderEncrypt%3AU2FsdGVkX1%2FP4jSts7zf8GLDQkh6qfBWcqhwgJ0VYnQ%3D; rl_page_init_referring_domain=RudderEncrypt%3AU2FsdGVkX19YQ76FNDdSSlXdS1M5hJrUtaNIUJ5V6E4%3D; rl_anonymous_id=RudderEncrypt%3AU2FsdGVkX1%2BVP68DW9YzdyKby5K6QHt6juuHthwKdw%2Fhna90xjN632yEJ3BtJvZ9IoSCN8G%2FdYMMS1KskElQUQ%3D%3D; rl_user_id=RudderEncrypt%3AU2FsdGVkX19FS%2FyGj4H%2FIwVcE7QXEjVAK43jAPW6ruTwwwcDWBVakfa589zpyecuBm9pt%2FwqM5UeITtaEnV%2BxexsCnBzyvqymiS87x0lJOEJfucDR8SMQ6Uw1b6VuJIoURC%2FxLiq8Nu6x%2B8Te7kt6TlD6G0v7cnHgbw%2FtRWTlm8%3D; rl_trait=RudderEncrypt%3AU2FsdGVkX187I7hAtVO%2BtcizsUFtMUg1uiUs3C3GLfYAOsQHl9jBrGGdpXLG%2BWpy3v3RJiZZrO3%2BIMvL5%2BUjy9XC22bLZAbqrq15ZQQ2jkTLG8nmMmx5ZUqzVMOgxQxpTVC%2FWiTD9IBj%2BIZI4xhQUg%3D%3D; rl_session=RudderEncrypt%3AU2FsdGVkX1%2FJm%2BgEm4yCpAv%2FWytYEYFhPVtt30X50KPwAmUbydx42BX%2FVy4VlqsJPUYPDHaCaxx62qbCuRptOa0Bjsfb3cuVDlVOZRBBSJKN6fixstCDe75pyaAAJ6OIQlEchq6S2SxYcDM9Y7SKlQ%3D%3D; ph_phc_4URIAm1uYfJO7j8kWSe0J8lc8IqnstRLS7Jx8NcakHo_posthog=%7B%22distinct_id%22%3A%22a91eb051aca0d40b5a5cafa9c49ba2c710294e0d342ee6d4fb8255b5abe5db6e%23d3eb3aea-7d08-49b3-aea3-7d801d5798c4%22%2C%22%24sesid%22%3A%5B1755651171241%2C%220198c4f1-937e-745b-a3be-ffdad789c398%22%2C1755650823037%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22http%3A%2F%2Flocalhost%3A5678%2Fsetup%22%7D%7D; ajs_anonymous_id=0ea4e822-cae5-4ef7-86bd-ffa931c7f9f1; username-localhost-8888="2|1:0|10:1762508582|23:username-localhost-8888|200:eyJ1c2VybmFtZSI6ICJlMWNiY2I5OTllM2Q0ZjBlODZiNDMyZjMzYTJjN2Q1NSIsICJuYW1lIjogIkFub255bW91cyBQYXNpcGhhZSIsICJkaXNwbGF5X25hbWUiOiAiQW5vbnltb3VzIFBhc2lwaGFlIiwgImluaXRpYWxzIjogIkFQIiwgImNvbG9yIjogbnVsbH0=|41d98f121fef0095e3027edf097a69c429ab4ef5b55813f427917bca83d1993f"; _xsrf=2|ebf3fa12|e9edc16d2cdf227c607b5683f253a031|1762508582; session=.eJy1j8Fq7SAQQP_FRVcXoomaGCj9kFJkMs7cK01NULMopf9e7237Fg-66IO3EpnxnOOb8JypXMRc80En4WMQs-Bx4cCSnek1k9GscDGKzYAByU7aLJLZEGk0DsOABvpRqsHIRZsQepy0VZbIBHbtZiyOWpMExa5XcIWxskryQM6CWvTiBiTnxqDbyFqJooXslF8gUap_0o5C-danTgJLZl-3Z0ot1y4SYTQTazfiABTsxI5RDQgGCUakHnpFtmEDnH2pUI_iOa6VcnsO69om64awUrs25EnscCZ_iaVu-VXMj-JS6z533W3pspU6T3KSXYXyHFPjJaRubdvdg-e1-sFfPTHc73lDKsWXA29nc1K5Du--9q4tdN8o-06hef_RE6CCj-lMpcYt-T3utMZEn5bpy_IjvkHykX4P_s5naN_6X_V_SZ7ePwB1PO2A.aSq6SQ.m7HCHLHS1Exiy0rvB8yOiPLLtVo; grafana_session=788ca3a14d434e5560a6ba85a42527a8; grafana_session_expiry=1764408745; _streamlit_xsrf=2|298664a0|306af1e91ff297aedf363250043e450a|1764407249
+
+.
+[2025-11-29T10:27:50.243+0100] {serve_logs.py:85} WARNING - The Authorization header is missing: Host: localhost:8793
+Connection: keep-alive
+Sec-Ch-Ua-Platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36
+Sec-Ch-Ua: "Not(A:Brand";v="99", "Google Chrome";v="133", "Chromium";v="133"
+Sec-Ch-Ua-Mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Referer: http://localhost:8793/home
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-GB,en-US;q=0.9,en;q=0.8,fr;q=0.7
+Cookie: rl_page_init_referrer=RudderEncrypt%3AU2FsdGVkX1%2FP4jSts7zf8GLDQkh6qfBWcqhwgJ0VYnQ%3D; rl_page_init_referring_domain=RudderEncrypt%3AU2FsdGVkX19YQ76FNDdSSlXdS1M5hJrUtaNIUJ5V6E4%3D; rl_anonymous_id=RudderEncrypt%3AU2FsdGVkX1%2BVP68DW9YzdyKby5K6QHt6juuHthwKdw%2Fhna90xjN632yEJ3BtJvZ9IoSCN8G%2FdYMMS1KskElQUQ%3D%3D; rl_user_id=RudderEncrypt%3AU2FsdGVkX19FS%2FyGj4H%2FIwVcE7QXEjVAK43jAPW6ruTwwwcDWBVakfa589zpyecuBm9pt%2FwqM5UeITtaEnV%2BxexsCnBzyvqymiS87x0lJOEJfucDR8SMQ6Uw1b6VuJIoURC%2FxLiq8Nu6x%2B8Te7kt6TlD6G0v7cnHgbw%2FtRWTlm8%3D; rl_trait=RudderEncrypt%3AU2FsdGVkX187I7hAtVO%2BtcizsUFtMUg1uiUs3C3GLfYAOsQHl9jBrGGdpXLG%2BWpy3v3RJiZZrO3%2BIMvL5%2BUjy9XC22bLZAbqrq15ZQQ2jkTLG8nmMmx5ZUqzVMOgxQxpTVC%2FWiTD9IBj%2BIZI4xhQUg%3D%3D; rl_session=RudderEncrypt%3AU2FsdGVkX1%2FJm%2BgEm4yCpAv%2FWytYEYFhPVtt30X50KPwAmUbydx42BX%2FVy4VlqsJPUYPDHaCaxx62qbCuRptOa0Bjsfb3cuVDlVOZRBBSJKN6fixstCDe75pyaAAJ6OIQlEchq6S2SxYcDM9Y7SKlQ%3D%3D; ph_phc_4URIAm1uYfJO7j8kWSe0J8lc8IqnstRLS7Jx8NcakHo_posthog=%7B%22distinct_id%22%3A%22a91eb051aca0d40b5a5cafa9c49ba2c710294e0d342ee6d4fb8255b5abe5db6e%23d3eb3aea-7d08-49b3-aea3-7d801d5798c4%22%2C%22%24sesid%22%3A%5B1755651171241%2C%220198c4f1-937e-745b-a3be-ffdad789c398%22%2C1755650823037%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22http%3A%2F%2Flocalhost%3A5678%2Fsetup%22%7D%7D; ajs_anonymous_id=0ea4e822-cae5-4ef7-86bd-ffa931c7f9f1; username-localhost-8888="2|1:0|10:1762508582|23:username-localhost-8888|200:eyJ1c2VybmFtZSI6ICJlMWNiY2I5OTllM2Q0ZjBlODZiNDMyZjMzYTJjN2Q1NSIsICJuYW1lIjogIkFub255bW91cyBQYXNpcGhhZSIsICJkaXNwbGF5X25hbWUiOiAiQW5vbnltb3VzIFBhc2lwaGFlIiwgImluaXRpYWxzIjogIkFQIiwgImNvbG9yIjogbnVsbH0=|41d98f121fef0095e3027edf097a69c429ab4ef5b55813f427917bca83d1993f"; _xsrf=2|ebf3fa12|e9edc16d2cdf227c607b5683f253a031|1762508582; session=.eJy1j8Fq7SAQQP_FRVcXoomaGCj9kFJkMs7cK01NULMopf9e7237Fg-66IO3EpnxnOOb8JypXMRc80En4WMQs-Bx4cCSnek1k9GscDGKzYAByU7aLJLZEGk0DsOABvpRqsHIRZsQepy0VZbIBHbtZiyOWpMExa5XcIWxskryQM6CWvTiBiTnxqDbyFqJooXslF8gUap_0o5C-danTgJLZl-3Z0ot1y4SYTQTazfiABTsxI5RDQgGCUakHnpFtmEDnH2pUI_iOa6VcnsO69om64awUrs25EnscCZ_iaVu-VXMj-JS6z533W3pspU6T3KSXYXyHFPjJaRubdvdg-e1-sFfPTHc73lDKsWXA29nc1K5Du--9q4tdN8o-06hef_RE6CCj-lMpcYt-T3utMZEn5bpy_IjvkHykX4P_s5naN_6X_V_SZ7ePwB1PO2A.aSq6SQ.m7HCHLHS1Exiy0rvB8yOiPLLtVo; grafana_session=788ca3a14d434e5560a6ba85a42527a8; grafana_session_expiry=1764408745; _streamlit_xsrf=2|298664a0|306af1e91ff297aedf363250043e450a|1764407249
+
+.

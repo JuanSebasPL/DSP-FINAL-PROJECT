@@ -1,131 +1,267 @@
-# HealthVision – Diabetes Prediction System
+HealthVision – Diabetes Prediction System
 
-**End-to-end ML system with Streamlit (UI), FastAPI (API), PostgreSQL (DB), and Airflow (automation).**
+End-to-End Data Science in Production Project
 
-- **Course:** Data Science in Production  
-- **Team:** HealthVision — Juan Sebastian Pereira Lopez, Iqra Javed, Kaviyarasan Arul Jothi, Basit Ur Rehman
+An end-to-end machine learning system for diabetes risk prediction, focusing on production engineering, including APIs, databases, orchestration, automation, and reproducibility.
 
----
+This project was developed as part of the Data Science in Production course.
 
-## Overview
-Predicts diabetes risk (0/1) from patient health indicators. Focus is on **production ops**: APIs, data pipelines, scheduling, persistence, and reproducibility.
+Project Overview
 
-**Dataset:** Pima Indians Diabetes — https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
+The system predicts diabetes risk (0/1) from patient health indicators and demonstrates how a real-world ML system operates in production.
 
-**Features:** `Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age`  
-**Target:** `Outcome` (0/1)
+Key Features
 
----
+FastAPI backend for predictions & data persistence
 
-## Tech Stack
-- **UI:** Streamlit 1.50.0
-- **API:** FastAPI 0.118.0 + Uvicorn 0.37.0
-- **DB:** PostgreSQL + SQLAlchemy 1.4.x + psycopg2-binary 2.9.x
-- **Pipelines:** Apache Airflow 2.10.3
-- **ML:** scikit-learn 1.7.x, pandas 2.3.x, numpy 2.3.x
-- **Python:** 3.12
+Streamlit frontend for user interaction
 
----
+PostgreSQL database for storing predictions and statistics
 
-## Quick Start
+Apache Airflow for data ingestion & scheduled predictions
 
-> Assumes `docker-compose` is available and a Python venv at `.venv/`.
+Docker Compose for infrastructure services
 
-```bash
-cd ~/projects/final_dsp_project/DSP-FINAL-PROJECT
-docker-compose up -d postgres pgadmin   # pgAdmin is optional
-# wait ~10s for DB startup
-2) Terminal 2 — FastAPI (Backend)
-bash
-Copy code
-cd ~/projects/final_dsp_project/DSP-FINAL-PROJECT/api
-source ../.venv/bin/activate
-uvicorn main:app --reload --port 8000
-# Keep this terminal open
-3) Terminal 3 — Streamlit (Frontend)
-bash
-Copy code
-cd ~/projects/final_dsp_project/DSP-FINAL-PROJECT
-source .venv/bin/activate
-streamlit run webapp/app.py
-Verify
-bash
-Copy code
-docker ps                          # should show postgres (+ pgadmin if enabled)
-curl http://localhost:8000         # {"message":"Welcome to DSP API"}
-# Streamlit opens at http://localhost:8501
-Running Airflow (ETL & Scheduled Predictions)
-Airflow orchestrates:
+Production-grade startup script (manage.sh) to run everything cleanly
 
-Ingestion DAG: reads ONE file per run from data/raw_data/, validates, moves to good_data/ or bad_data/.
-
-Prediction DAG: checks good_data/ for new files and calls POST /predict?source=scheduled.
-
-Local (no Docker)
-bash
-Copy code
-# First time only
-export AIRFLOW_HOME=$(pwd)/airflow
-airflow db init
-airflow users create --username admin --firstname Admin --lastname User \
-  --role Admin --email admin@example.com --password admin
-
-# Run (two terminals)
-airflow webserver -p 8080
-airflow scheduler
-# UI: http://localhost:8080  → enable your DAGs
-Folders used by DAGs
-
-bash
-Copy code
-data/raw_data/    # new incoming CSVs
-data/good_data/   # validated for prediction
-data/bad_data/    # rejected files
-🔌 API Endpoints (FastAPI)
-GET / → health: {"message": "Welcome to DSP API"}
-
-POST /model/train → (optional) train/save model
-
-POST /predict?source=webapp|scheduled
-
-Body: {"data": [ { "pregnancies": ..., "glucose": ..., ... }, ... ] }
-
-Returns: {"predictions": [...], "items": [{...,"timestamp","source"}]}
-
-Persists to DB: features, prediction, timestamp, source.
-
-📁 Project Structure (short)
-bash
-Copy code
+Tech Stack
+Component	Technology
+UI	Streamlit
+API	FastAPI + Uvicorn
+ML	scikit-learn
+Database	PostgreSQL
+Orchestration	Apache Airflow
+Infrastructure	Docker + Docker Compose
+Language	Python 3.12
+Project Structure
 DSP-FINAL-PROJECT/
-├─ api/                 # FastAPI service
-│  ├─ main.py
-│  ├─ schemas/
-│  └─ services/
-├─ webapp/              # Streamlit app
-│  ├─ app.py
-│  └─ api_client.py
-├─ dags/                # Airflow DAGs
-│  ├─ process_new_files_dag.py
-│  └─ prediction_dag.py
-├─ data/                # raw/good/bad data folders
-├─ models/              # saved model(s)
-├─ requirements.txt
-└─ docker-compose.yml   # postgres (+ pgadmin), airflow (if present)
- Minimal Troubleshooting
-Port in use: change with --port (FastAPI) or update compose ports.
+├── api/                    # FastAPI backend
+├── webapp/                 # Streamlit UI
+├── airflow/                # Airflow home (DAGs, logs, config)
+│   └── dags/
+├── data/
+│   ├── raw_data/           # Incoming CSVs
+│   ├── good_data/          # Validated data
+│   └── bad_data/           # Invalid data
+├── db/
+│   └── master_sql          # Database schema
+├── docker-compose.yaml     # Postgres + pgAdmin
+├── .venv/                  # Python virtual environment
+├── manage.sh               # Professional service manager
+├── env.sh                  # Shared environment variables
+└── README.md
 
-DB connect error: ensure DB_CONN_STRING in api/main.py matches docker-compose env.
+Dataset
 
-No files processed: confirm CSVs in data/raw_data/ and DAGs are enabled.
+Pima Indians Diabetes Dataset
+https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
 
-Streamlit not opening: visit http://localhost:8501 manually.
+Features
 
- Notes
-source query param is used to tag predictions: webapp (UI) vs scheduled (Airflow).
+Pregnancies
 
-Each ingestion DAG run processes exactly one file to simulate streaming.
+Glucose
 
-Grafana monitoring is optional and not required for grading.
+BloodPressure
 
-© 2025 HealthVision
+SkinThickness
+
+Insulin
+
+BMI
+
+DiabetesPedigreeFunction
+
+Age
+
+Target: Outcome (0 = No Diabetes, 1 = Diabetes)
+
+How to Run Everything (Recommended Way)
+
+⚠️ This project should always be started using manage.sh
+It automatically stops conflicting services and avoids port issues.
+
+1️⃣ Prerequisites
+
+Docker Desktop (with WSL integration enabled)
+
+Python 3.12
+
+Virtual environment already created at .venv/
+
+2️⃣ Start all services
+
+From the project root:
+
+./manage.sh start
+
+
+This will automatically:
+
+Start Docker services (Postgres + pgAdmin)
+
+Start FastAPI (port 8000)
+
+Start Streamlit (port 8501)
+
+Start Airflow webserver & scheduler (port 8080)
+
+Kill any conflicting processes on used ports
+
+Write logs to ./logs/
+
+3️⃣ Check service status
+./manage.sh status
+
+
+Expected output:
+
+✅ api running
+✅ streamlit running
+✅ airflow_webserver running
+✅ airflow_scheduler running
+
+4️⃣ Access the applications
+Service	URL
+FastAPI	http://localhost:8000
+
+Streamlit UI	http://localhost:8501
+
+Airflow UI	http://localhost:8080
+
+pgAdmin	http://localhost:5051
+
+PostgreSQL	localhost:5432
+5️⃣ Stop everything
+./manage.sh stop
+
+6️⃣ Restart cleanly (recommended if something breaks)
+./manage.sh restart
+
+Airflow Pipelines
+1️⃣ Data Ingestion DAG
+
+DAG ID: data_ingestion_pipeline
+
+Reads one CSV per run from data/raw_data/
+
+Validates schema & values
+
+Moves files to good_data/ or bad_data/
+
+Sends file statistics to the API
+
+Saves statistics to PostgreSQL (file_statistics table)
+
+2️⃣ Prediction DAG
+
+DAG ID: process_success_files_dag
+
+Detects new files only
+
+Calls /predict?source=scheduled
+
+Stores predictions in PostgreSQL (diabetes_data table)
+
+Skips execution if no new data (expected production behavior)
+
+Database Tables
+diabetes_data (Predictions)
+
+Stores:
+
+Input features
+
+Prediction result
+
+Source (webapp or scheduled)
+
+Timestamp
+
+file_statistics
+
+Stores:
+
+Filename
+
+Total rows
+
+Valid / invalid rows
+
+Validation errors
+
+Timestamp
+
+Logs & Debugging
+
+All logs are written to:
+
+./logs/
+
+
+Useful commands:
+
+tail -f logs/api.log
+tail -f logs/streamlit.log
+tail -f logs/airflow_webserver.log
+tail -f logs/airflow_scheduler.log
+
+Common Issues & Fixes
+Port already in use
+
+✔ Automatically handled by manage.sh
+
+DAG shows “skipped”
+
+✔ Normal behavior — no new data to process
+
+Database tables missing
+
+✔ Recreated using db/master_sql
+
+Team – HealthVision
+
+Juan Sebastian Pereira Lopez
+
+Iqra Javed
+
+Kaviyarasan Arul Jothi
+
+Basit Ur Rehman
+
+Course
+
+Data Science in Production
+
+Final Notes
+
+This project demonstrates:
+
+Production-ready ML architecture
+
+Automated pipelines
+
+Robust error handling
+
+Reproducible infrastructure
+
+Clean operational workflows
+
+
+
+To run Grafana:
+
+
+- First, see what the service is called in compose:
+
+docker compose config --services
+
+
+- If grafana appears in the list, start it:
+
+docker compose up -d grafana
+
+
+- If the service name is different (like grafana-service), run:
+
+docker compose up -d <service_name>

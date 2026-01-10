@@ -1,0 +1,18 @@
+[2025-11-29 10:24:01 +0100] [95716] [INFO] Starting gunicorn 23.0.0
+[2025-11-29 10:24:01 +0100] [95716] [INFO] Listening at: http://[::]:8793 (95716)
+[2025-11-29 10:24:01 +0100] [95716] [INFO] Using worker: sync
+[2025-11-29 10:24:01 +0100] [95717] [INFO] Booting worker with pid: 95717
+[2025-11-29 10:24:01 +0100] [95718] [INFO] Booting worker with pid: 95718
+[2025-11-29 10:30:48 +0100] [95718] [INFO] Worker exiting (pid: 95718)
+[2025-11-29 10:30:48 +0100] [95717] [INFO] Worker exiting (pid: 95717)
+[2025-11-29 10:30:48 +0100] [95716] [INFO] Handling signal: term
+[2025-11-29 10:30:48 +0100] [95716] [INFO] Shutting down: Master
+Terminating on signal 15
+Exception ignored in: <Finalize object, dead>
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/multiprocessing/util.py", line 227, in __call__
+    res = self._callback(*self._args, **self._kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/util.py", line 469, in close_fds
+    os.close(fd)
+OSError: [Errno 9] Bad file descriptor

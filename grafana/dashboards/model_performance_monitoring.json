@@ -1,0 +1,1137 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 4,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": true,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 11,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "colorByField": "Feature",
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- First create the table (run in PostgreSQL)\r\nCREATE TABLE IF NOT EXISTS feature_importance (\r\n    feature_name VARCHAR(50),\r\n    importance_score NUMERIC(5,3)\r\n);\r\n\r\n-- Insert data\r\nINSERT INTO feature_importance VALUES\r\n('Glucose', 0.285),\r\n('BMI', 0.198),\r\n('Age', 0.156),\r\n('Diabetes Pedigree', 0.143),\r\n('Blood Pressure', 0.089),\r\n('Insulin', 0.067),\r\n('Pregnancies', 0.034),\r\n('Skin Thickness', 0.028)\r\nON CONFLICT DO NOTHING;\r\n\r\n-- Query for Grafana\r\nSELECT \r\n    feature_name as \"Feature\",\r\n    ROUND(CAST(importance_score * 100 AS NUMERIC), 1) as \"Importance\"\r\nFROM feature_importance\r\nORDER BY importance_score DESC;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": " Feature Importance ",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 70
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH metrics AS (\r\n    SELECT \r\n        SUM(CASE WHEN prediction = 1 AND actual_outcome = 1 THEN 1 ELSE 0 END)::FLOAT as tp,\r\n        SUM(CASE WHEN prediction = 1 AND actual_outcome = 0 THEN 1 ELSE 0 END)::FLOAT as fp\r\n    FROM diabetes_data\r\n    WHERE actual_outcome IS NOT NULL\r\n)\r\nSELECT \r\n    ROUND(CAST((tp / NULLIF(tp + fp, 0)) * 100 AS NUMERIC), 2) as value\r\nFROM metrics;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Precision (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "description": "Overview of model performance metrics",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false,
+            "styleField": "Metric",
+            "wrapText": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 60
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Value"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH metrics AS (\r\n    SELECT \r\n        COUNT(*) as total_predictions,\r\n        SUM(CASE WHEN prediction = actual_outcome THEN 1 ELSE 0 END) as correct_predictions,\r\n        SUM(CASE WHEN prediction = 1 AND actual_outcome = 1 THEN 1 ELSE 0 END) as true_positives,\r\n        SUM(CASE WHEN prediction = 1 AND actual_outcome = 0 THEN 1 ELSE 0 END) as false_positives,\r\n        SUM(CASE WHEN prediction = 0 AND actual_outcome = 1 THEN 1 ELSE 0 END) as false_negatives,\r\n        SUM(CASE WHEN prediction = 0 AND actual_outcome = 0 THEN 1 ELSE 0 END) as true_negatives\r\n    FROM diabetes_data\r\n    WHERE actual_outcome IS NOT NULL\r\n)\r\nSELECT \r\n    'Total Predictions' as \"Metric\",\r\n    CAST(total_predictions AS TEXT) as \"Value\"\r\nFROM metrics\r\nUNION ALL\r\nSELECT \r\n    'Accuracy (%)',\r\n    CAST(ROUND(CAST((correct_predictions::FLOAT / NULLIF(total_predictions, 0) * 100) AS NUMERIC), 2) AS TEXT)\r\nFROM metrics\r\nUNION ALL\r\nSELECT \r\n    'Error Rate (%)',\r\n    CAST(ROUND(CAST(((false_positives + false_negatives)::FLOAT / NULLIF(total_predictions, 0) * 100) AS NUMERIC), 2) AS TEXT)\r\nFROM metrics\r\nUNION ALL\r\nSELECT \r\n    'True Positives',\r\n    CAST(true_positives AS TEXT)\r\nFROM metrics\r\nUNION ALL\r\nSELECT \r\n    'False Positives',\r\n    CAST(false_positives AS TEXT)\r\nFROM metrics\r\nUNION ALL\r\nSELECT \r\n    'True Negatives',\r\n    CAST(true_negatives AS TEXT)\r\nFROM metrics\r\nUNION ALL\r\nSELECT \r\n    'False Negatives',\r\n    CAST(false_negatives AS TEXT)\r\nFROM metrics;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Model Performance Summary",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "color-background"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*/"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "Actually Negative (FP)": {
+                        "color": "red",
+                        "index": 1,
+                        "text": "Actually Negative (FP)"
+                      },
+                      "Actually Positive (TP)": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "Actually Positive (TP)"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 13,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Actually Positive (TP)"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    'Predicted Positive' as \"Prediction\",\r\n    SUM(CASE WHEN prediction = 1 AND actual_outcome = 1 THEN 1 ELSE 0 END) as \"Actually Positive (TP)\",\r\n    SUM(CASE WHEN prediction = 1 AND actual_outcome = 0 THEN 1 ELSE 0 END) as \"Actually Negative (FP)\"\r\nFROM diabetes_data\r\nWHERE actual_outcome IS NOT NULL\r\nUNION ALL\r\nSELECT \r\n    'Predicted Negative',\r\n    SUM(CASE WHEN prediction = 0 AND actual_outcome = 1 THEN 1 ELSE 0 END) as \"Actually Positive (FN)\",\r\n    SUM(CASE WHEN prediction = 0 AND actual_outcome = 0 THEN 1 ELSE 0 END) as \"Actually Negative (TN)\"\r\nFROM diabetes_data\r\nWHERE actual_outcome IS NOT NULL;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Confusion Matrix",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    COUNT(*) as value\r\nFROM diabetes_data\r\nWHERE prediction = 0 AND actual_outcome = 1;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "False Negatives (Type II Error)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 75
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 8,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH metrics AS (\r\n    SELECT \r\n        SUM(CASE WHEN prediction = 1 AND actual_outcome = 1 THEN 1 ELSE 0 END)::FLOAT as tp,\r\n        SUM(CASE WHEN prediction = 1 AND actual_outcome = 0 THEN 1 ELSE 0 END)::FLOAT as fp,\r\n        SUM(CASE WHEN prediction = 0 AND actual_outcome = 1 THEN 1 ELSE 0 END)::FLOAT as fn\r\n    FROM diabetes_data\r\n    WHERE actual_outcome IS NOT NULL\r\n),\r\ncalc AS (\r\n    SELECT \r\n        tp / NULLIF(tp + fp, 0) as precision,\r\n        tp / NULLIF(tp + fn, 0) as recall\r\n    FROM metrics\r\n)\r\nSELECT \r\n    ROUND(CAST((2 * precision * recall / NULLIF(precision + recall, 0)) * 100 AS NUMERIC), 2) as value\r\nFROM calc;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "F1-Score (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 62,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 2,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "purple",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 9,
+      "options": {
+        "barRadius": 0.15,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    CASE \r\n        WHEN prediction_confidence >= 0.9 THEN 'Very High (90-100%)'\r\n        WHEN prediction_confidence >= 0.7 THEN 'High (70-90%)'\r\n        WHEN prediction_confidence >= 0.5 THEN 'Medium (50-70%)'\r\n        ELSE 'Low (<50%)'\r\n    END as \"Confidence Level\",\r\n    COUNT(*) as \"Count\"\r\nFROM diabetes_data\r\nWHERE prediction_confidence IS NOT NULL\r\nGROUP BY \r\n    CASE \r\n        WHEN prediction_confidence >= 0.9 THEN 'Very High (90-100%)'\r\n        WHEN prediction_confidence >= 0.7 THEN 'High (70-90%)'\r\n        WHEN prediction_confidence >= 0.5 THEN 'Medium (50-70%)'\r\n        ELSE 'Low (<50%)'\r\n    END\r\nORDER BY MIN(prediction_confidence) DESC;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Prediction Confidence Distribution",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 70
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 7,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH metrics AS (\r\n    SELECT \r\n        SUM(CASE WHEN prediction = 1 AND actual_outcome = 1 THEN 1 ELSE 0 END)::FLOAT as tp,\r\n        SUM(CASE WHEN prediction = 0 AND actual_outcome = 1 THEN 1 ELSE 0 END)::FLOAT as fn\r\n    FROM diabetes_data\r\n    WHERE actual_outcome IS NOT NULL\r\n)\r\nSELECT \r\n    ROUND(CAST((tp / NULLIF(tp + fn, 0)) * 100 AS NUMERIC), 2) as value\r\nFROM metrics;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Recall / Sensitivity (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    COUNT(*) as value\r\nFROM diabetes_data\r\nWHERE prediction = 0 AND actual_outcome = 0;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "True Negatives (Correct)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 75
+              },
+              {
+                "color": "blue",
+                "value": 85
+              },
+              {
+                "color": "semi-dark-green",
+                "value": 95
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff9kvlpjxvcw0f"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    DATE_TRUNC('day', timestamp) as time,\r\n    ROUND(\r\n        (COUNT(CASE WHEN prediction = actual_outcome THEN 1 END) * 100.0 / COUNT(*)), \r\n        2\r\n    ) as accuracy_percentage\r\nFROM diabetes_data\r\nWHERE actual_outcome IS NOT NULL\r\nGROUP BY DATE_TRUNC('day', timestamp)\r\nORDER BY time;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Model Accuracy Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff9kvlpjxvcw0f"
+      },
+      "description": "Confusion Matrix ",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "airflow_db",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    COUNT(*) as value\r\nFROM diabetes_data\r\nWHERE prediction = 1 AND actual_outcome = 1;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "True Positives (Correct)",
+      "type": "stat"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "Last 1 Hour",
+          "value": "Last 1 Hour"
+        },
+        "label": "Time Range",
+        "name": "time_range",
+        "options": [
+          {
+            "selected": true,
+            "text": "1h",
+            "value": "Last 1 Hour"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "Last 12 Hours"
+          },
+          {
+            "selected": false,
+            "text": "24h",
+            "value": "Last 24 Hours"
+          },
+          {
+            "selected": false,
+            "text": "7d",
+            "value": "Last 7 Days"
+          }
+        ],
+        "query": "1h : Last 1 Hour,\n12h : Last 12 Hours,\n24h : Last 24 Hours,\n7d : Last 7 Days",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Model Performance Monitoring",
+  "uid": "adh6nnn",
+  "version": 1
+}

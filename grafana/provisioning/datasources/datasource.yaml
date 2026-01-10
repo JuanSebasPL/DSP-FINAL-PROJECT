@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: Postgres
+    uid: ff9kvlpjxvcw0f
+    type: postgres
+    access: proxy
+    isDefault: true
+    url: airflow_postgres:5432
+    user: admin
+    secureJsonData:
+      password: admin
+    jsonData:
+      database: airflow_db
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false

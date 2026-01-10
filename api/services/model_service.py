@@ -1,4 +1,5 @@
 import os
+import pickle
 import pandas as pd
 from typing import Any
 from sklearn.ensemble import RandomForestClassifier
@@ -6,14 +7,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import joblib
 
-MODEL_PATH = "models/model.joblib"
-DATA_PATH = "models/diabetes.csv"
+MODEL_PATH = "../models/model.joblib"
+DATA_PATH = "/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/api/models/diabetes.csv"
 
 
 def load_model() -> RandomForestClassifier | None:
+    """Load the trained model saved as joblib."""
     if os.path.exists(MODEL_PATH):
-        with open(MODEL_PATH, "rb") as f:
-            return pickle.load(f)
+        try:
+            return joblib.load(MODEL_PATH)   # ✅ FIXED — use joblib, not pickle
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            return None
+
     print("Model not found.")
     return None
 
@@ -40,7 +46,7 @@ def train_and_save_model() -> dict[str, Any]:
     acc = accuracy_score(y_test, preds)
 
     os.makedirs("models", exist_ok=True)
-    joblib.dump(model, MODEL_PATH)
+    joblib.dump(model, MODEL_PATH)  # saving correctly
 
     print(f"Model trained and saved (Accuracy: {acc:.2f})")
     return {"message": "Model created successfully", "accuracy": round(acc, 2)}

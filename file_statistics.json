@@ -396,4 +396,12 @@
   "title": "file_statistics",
   "uid": "adrm9gn",
   "version": 12
-}
+}{'filename': 'diabetes_batch_0031.csv', 'nb_rows': 10, 'nb_valid_rows': 10, 'nb_invalid_rows': 0, 'errors': '', 'timestamp': '2025-11-29 03:26:32.328019'}
+{'filename': 'diabetes_batch_0015.csv', 'nb_rows': 10, 'nb_valid_rows': 10, 'nb_invalid_rows': 0, 'errors': '', 'timestamp': '2025-11-29 03:27:19.684199'}
+{'filename': 'diabetes_batch_0029.csv', 'nb_rows': 10, 'nb_valid_rows': 10, 'nb_invalid_rows': 0, 'errors': '', 'timestamp': '2025-11-29 03:30:06.052265'}
+{'filename': 'diabetes_batch_0025.csv', 'nb_rows': 10, 'nb_valid_rows': 10, 'nb_invalid_rows': 0, 'errors': '', 'timestamp': '2025-11-29 03:35:07.749137'}
+{'filename': 'diabetes_batch_0008.csv', 'nb_rows': 10, 'nb_valid_rows': 10, 'nb_invalid_rows': 0, 'errors': '', 'timestamp': '2025-11-29 03:40:09.230300'}
+{'additionalProp1': {}}
+{'additionalProp1': {}}
+{'additionalProp1': {}}
+{'filename': 'diabetes_batch_0018.csv', 'nb_rows': 10, 'nb_valid_rows': 10, 'nb_invalid_rows': 0, 'errors': '', 'timestamp': '2025-11-29 03:45:06.961468'}

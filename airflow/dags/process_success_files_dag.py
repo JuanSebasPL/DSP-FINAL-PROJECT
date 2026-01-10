@@ -13,14 +13,16 @@ default_args = {
     "retry_delay": timedelta(minutes=2),
 }
 
-BASE_DIR = os.path.dirname(__file__) 
-PROJECT_ROOT = os.path.dirname(BASE_DIR)
-DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-GOOD_DATA_DIR = os.path.join(DATA_DIR, "good_data")   # folder with ingested files
-PROCESSED_LIST = os.path.join(DATA_DIR, "processed_files.txt")
+# -------------------------------------------------------------------
+# FIXED ABSOLUTE PATHS (FINAL — DO NOT CHANGE)
+# -------------------------------------------------------------------
 
-PREDICT_ENDPOINT = "http://127.0.0.1:8000/predict?source=scheduled"   
+BASE_PATH = "/home/brk/projects/final_dsp_project/DSP-FINAL-PROJECT/data"
 
+GOOD_DATA_DIR = os.path.join(BASE_PATH, "good_data")
+PROCESSED_LIST = os.path.join(BASE_PATH, "processed_files.txt")
+
+PREDICT_ENDPOINT = "http://127.0.0.1:8000/predict?source=scheduled"
 
 # -------------------------------------------------------------------
 # Utility: load list of already processed files
@@ -31,7 +33,6 @@ def load_processed_files():
     with open(PROCESSED_LIST, "r") as f:
         return set(line.strip() for line in f.readlines())
 
-
 # -------------------------------------------------------------------
 # Utility: save processed files
 # -------------------------------------------------------------------
@@ -40,15 +41,16 @@ def save_processed_files(files):
         for file in files:
             f.write(file + "\n")
 
-
 # -------------------------------------------------------------------
 # Task 1 – Check for NEW DATA
 # -------------------------------------------------------------------
 def check_for_new_data(**context):
     os.makedirs(GOOD_DATA_DIR, exist_ok=True)
 
-    all_files = [f for f in os.listdir(GOOD_DATA_DIR)
-                 if os.path.isfile(os.path.join(GOOD_DATA_DIR, f))]
+    all_files = [
+        f for f in os.listdir(GOOD_DATA_DIR)
+        if os.path.isfile(os.path.join(GOOD_DATA_DIR, f))
+    ]
 
     processed = load_processed_files()
     new_files = [f for f in all_files if f not in processed]
@@ -59,15 +61,15 @@ def check_for_new_data(**context):
 
     print(f"New files detected: {new_files}")
 
-    # pass list to next task
     context["ti"].xcom_push(key="new_files", value=new_files)
-
 
 # -------------------------------------------------------------------
 # Task 2 – Read new files & make predictions
 # -------------------------------------------------------------------
 def make_predictions(**context):
-    new_files = context["ti"].xcom_pull(key="new_files", task_ids="check_for_new_data")
+    new_files = context["ti"].xcom_pull(
+        key="new_files", task_ids="check_for_new_data"
+    )
 
     for filename in new_files:
         filepath = os.path.join(GOOD_DATA_DIR, filename)
@@ -91,10 +93,8 @@ def make_predictions(**context):
         except Exception as e:
             print(f"ERROR processing {filename}: {e}")
 
-    # mark these files as processed
     save_processed_files(new_files)
     print("Updated processed_files registry.")
-
 
 # -------------------------------------------------------------------
 # DAG DEFINITION
@@ -111,13 +111,11 @@ with DAG(
     check_task = PythonOperator(
         task_id="check_for_new_data",
         python_callable=check_for_new_data,
-        provide_context=True,
     )
 
     predict_task = PythonOperator(
         task_id="make_predictions",
         python_callable=make_predictions,
-        provide_context=True,
     )
 
     check_task >> predict_task
